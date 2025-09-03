@@ -1,0 +1,70 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f0f8ff;
+  margin: 0;
+  color: #003366;
+}
+.navbar {
+  background: #003366;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+}
+.menu-icon {
+  font-size: 24px;
+  cursor: pointer;
+}
+.menu {
+  list-style: none;
+  display: none;
+  margin: 0;
+  padding: 0;
+}
+.menu li {
+  padding: 0.5rem 0;
+  cursor: pointer;
+}
+.menu li:hover {
+  text-decoration: underline;
+}
+.page {
+  display: none;
+  padding: 1rem;
+}
+.page.active {
+  display: block;
+}
+.field {
+  margin-bottom: 0.5rem;
+}
+.field label {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+#historyTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+#historyTable th, #historyTable td {
+  border: 1px solid #003366;
+  padding: 0.25rem;
+  text-align: left;
+}
+#deptChart {
+  max-width: 600px;
+  margin: 1rem auto;
+}
+.round-only {
+  display: none;
+}
+@media (min-width: 600px) {
+  .menu {
+    display: flex;
+    flex: 1;
+    justify-content: flex-end;
+  }
+  .menu li {
+    margin-left: 1rem;
+  }
+}
