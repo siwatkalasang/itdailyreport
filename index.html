@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Sands Khaolak Transportation Request</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="menu-icon" id="menuToggle">&#9776;</div>
+    <ul class="menu" id="menu">
+      <li data-section="requestSection">Request</li>
+      <li data-section="hmSection">HM Approval</li>
+      <li data-section="exportSection">Export</li>
+    </ul>
+  </nav>
+
+  <section id="requestSection" class="page active">
+    <h1>Transportation Request</h1>
+    <form id="requestForm">
+      <div class="field">
+        <label>Request Number</label>
+        <input type="text" id="requestNumber" name="requestNumber" readonly />
+      </div>
+      <div class="field">
+        <label>Staff Name</label>
+        <input type="text" id="staffName" required />
+      </div>
+      <div class="field">
+        <label>Hotel</label>
+        <select id="hotel" required>
+          <option value="The Sands Khaolak">The Sands Khaolak</option>
+          <option value="The Waters Khaolak">The Waters Khaolak</option>
+          <option value="The Little Shore Khaolak">The Little Shore Khaolak</option>
+          <option value="The Leaf Oceanside">The Leaf Oceanside</option>
+          <option value="The Leaf on The Sands">The Leaf on The Sands</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Department</label>
+        <select id="department" required>
+          <option value="AC">AC</option>
+          <option value="CR">CR</option>
+          <option value="EN">EN</option>
+          <option value="EX">EX</option>
+          <option value="FB">FB</option>
+          <option value="FO">FO</option>
+          <option value="HK">HK</option>
+          <option value="IT">IT</option>
+          <option value="KC">KC</option>
+          <option value="HR">HR</option>
+          <option value="SA">SA</option>
+          <option value="SPA">SPA</option>
+          <option value="TLKL">TLKL</option>
+          <option value="TN">TN</option>
+          <option value="MELON">MELON</option>
+          <option value="ENS">ENS</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Transfer Type</label>
+        <select id="transferType" required>
+          <option value="one">Transfer one way</option>
+          <option value="round">Transfer round trip</option>
+        </select>
+      </div>
+
+      <div id="transferFields">
+        <div class="field">
+          <label>Transfer From</label>
+          <input type="text" id="transferFrom1" required />
+        </div>
+        <div class="field">
+          <label>Transfer To</label>
+          <input type="text" id="transferTo1" required />
+        </div>
+        <div class="field round-only">
+          <label>Return From</label>
+          <input type="text" id="transferFrom2" />
+        </div>
+        <div class="field round-only">
+          <label>Return To</label>
+          <input type="text" id="transferTo2" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Service Date</label>
+        <input type="datetime-local" id="serviceDate" required />
+      </div>
+      <div class="field">
+        <label>Carrier Time</label>
+        <input type="datetime-local" id="carrierTime" required />
+      </div>
+      <div class="field">
+        <label>Expense</label>
+        <input type="text" id="expense" />
+      </div>
+      <div class="field">
+        <label>Total (Baht)</label>
+        <input type="number" id="total" />
+      </div>
+      <div class="field">
+        <label>Reason</label>
+        <input type="text" id="reason" />
+      </div>
+      <div class="field">
+        <label>Request by</label>
+        <input type="text" id="requestBy" />
+      </div>
+      <div class="field">
+        <label>Request Date</label>
+        <input type="datetime-local" id="requestDate" />
+      </div>
+      <button type="submit">Submit</button>
+    </form>
+
+    <h2>History</h2>
+    <table id="historyTable">
+      <thead>
+        <tr>
+          <th>Request No.</th>
+          <th>Staff</th>
+          <th>Department</th>
+          <th>Service Date</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <h2>Usage by Department</h2>
+    <canvas id="deptChart"></canvas>
+  </section>
+
+  <section id="hmSection" class="page">
+    <h1>HM Approval</h1>
+    <div class="field">
+      <label>Select Request</label>
+      <select id="hmRequestSelect"></select>
+    </div>
+    <div id="hmDetails"></div>
+    <button id="approveBtn">Approve</button>
+  </section>
+
+  <section id="exportSection" class="page">
+    <h1>Export Request</h1>
+    <div class="field">
+      <label>Select Request</label>
+      <select id="exportRequestSelect"></select>
+    </div>
+    <div id="exportDetails"></div>
+    <button id="exportBtn">Download PDF</button>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
