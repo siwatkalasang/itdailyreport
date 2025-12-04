@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meeting Room Booking</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <button id="menu-toggle" aria-label="เปิดเมนู" class="hamburger">
+      <span></span><span></span><span></span>
+    </button>
+    <h1>จองห้องประชุม</h1>
+  </header>
+  <aside id="sidebar" class="sidebar hidden">
+    <nav>
+      <ul>
+        <li><button class="nav-link" data-target="dashboard-section">แดชบอร์ด</button></li>
+        <li><button class="nav-link" data-target="booking-section">หน้าจองของผู้จอง</button></li>
+        <li><button class="nav-link" data-target="ticket-section">หน้ารวม Ticket</button></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main>
+    <section id="dashboard-section" class="panel">
+      <div class="panel-header">
+        <h2>แดชบอร์ดการจอง</h2>
+        <p>แยกตามโรงแรม + แผนก ของผู้จอง</p>
+      </div>
+      <canvas id="bookingChart" height="320"></canvas>
+      <p class="hint">ข้อมูลจะอัปเดตอัตโนมัติเมื่อมีการจองหรือเปลี่ยนสถานะ</p>
+    </section>
+
+    <section id="booking-section" class="panel hidden">
+      <div class="panel-header">
+        <h2>หน้าจองของผู้จอง</h2>
+        <p>เลือกห้องประชุม ระบุรายละเอียด และส่งคำขอ</p>
+      </div>
+      <form id="booking-form" class="form-grid">
+        <label>โรงแรม
+          <select name="hotel" required>
+            <option value="">เลือกโรงแรม</option>
+            <option value="รร.ปันหยี">รร.ปันหยี</option>
+            <option value="รร.พิงกัน">รร.พิงกัน</option>
+            <option value="บุคคลภายนอก">บุคคลภายนอก</option>
+          </select>
+        </label>
+        <label>แผนก
+          <select name="department" required>
+            <option value="">เลือกแผนก</option>
+            <option value="HR">HR</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Sales">Sales</option>
+            <option value="IT">IT</option>
+            <option value="อื่น ๆ">อื่น ๆ</option>
+          </select>
+        </label>
+        <label class="full">Remark (สำหรับบุคคลภายนอก)
+          <textarea name="remark" rows="2" placeholder="ระบุข้อมูลเสริมเมื่อเป็นบุคคลภายนอก"></textarea>
+        </label>
+        <label>ห้องประชุม
+          <select name="room" required>
+            <option value="">เลือกห้องประชุม</option>
+            <option value="ห้องประชุมปันหยี">ห้องประชุมปันหยี</option>
+            <option value="ห้องประชุมพิงกัน">ห้องประชุมพิงกัน</option>
+          </select>
+        </label>
+        <label>รูปแบบการจัดโต๊ะ
+          <select name="layout" required>
+            <option value="">เลือกรูปแบบ</option>
+            <option value="Classroom">Classroom</option>
+            <option value="U-Shape">U-Shape</option>
+            <option value="Theater">Theater</option>
+            <option value="Boardroom">Boardroom</option>
+          </select>
+        </label>
+        <label class="full">ชื่องานประชุม (สำหรับติดหน้าห้อง)
+          <input type="text" name="eventName" required placeholder="เช่น Monthly Review" />
+        </label>
+        <label>วันที่ประชุม
+          <input type="date" name="meetingDate" required />
+        </label>
+        <label>เวลาเริ่ม
+          <input type="time" name="startTime" required />
+        </label>
+        <label>เวลาสิ้นสุด
+          <input type="time" name="endTime" required />
+        </label>
+        <label class="full">ผู้ติดต่อ
+          <input type="text" name="requester" required placeholder="ชื่อ-สกุล ผู้จอง" />
+        </label>
+        <label class="full">เบอร์โทรศัพท์
+          <input type="tel" name="phone" required placeholder="08x-xxx-xxxx" />
+        </label>
+        <button type="submit" class="primary full">ส่งคำขอจอง</button>
+      </form>
+      <div id="booking-message" role="status" class="message" aria-live="polite"></div>
+    </section>
+
+    <section id="ticket-section" class="panel hidden">
+      <div class="panel-header">
+        <h2>หน้ารวม Ticket</h2>
+        <p>ต้องใส่ PIN 1234 ก่อนเข้าดูข้อมูล</p>
+      </div>
+      <div id="pin-gate" class="pin-gate">
+        <input type="password" id="pin-input" placeholder="กรอก PIN" maxlength="4" />
+        <button id="pin-submit" class="primary">ยืนยัน</button>
+        <p class="hint">ใช้ PIN 1234 เพื่อเข้าถึงรายการคำขอ</p>
+        <div id="pin-message" class="message"></div>
+      </div>
+      <div id="ticket-content" class="hidden">
+        <div class="ticket-actions">
+          <button id="refresh-tickets" class="secondary">รีเฟรชรายการ</button>
+          <div class="export-controls">
+            <select id="export-select"></select>
+            <button id="export-pdf" class="primary ghost">Export PDF</button>
+          </div>
+        </div>
+        <div id="ticket-list" class="ticket-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="print-area" aria-hidden="true"></div>
+
+  <script type="module" src="firebase-config.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
