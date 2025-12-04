@@ -10,6 +10,8 @@ import {
   updateDoc,
   deleteDoc,
   doc,
+  getDocs,
+  limit,
 } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 
@@ -30,8 +32,11 @@ const ticketContent = document.getElementById("ticket-content");
 const ticketList = document.getElementById("ticket-list");
 const refreshTickets = document.getElementById("refresh-tickets");
 const exportPdfBtn = document.getElementById("export-pdf");
+const exportSelect = document.getElementById("export-select");
+const printArea = document.getElementById("print-area");
 let bookingChart;
 let unsubscribeTickets;
+let bookingsCache = new Map();
 
 function toggleSidebar() {
   sidebar.classList.toggle("hidden");
@@ -82,6 +87,7 @@ bookingForm.addEventListener("submit", async (event) => {
   }
 
   try {
+    const requestNumber = await getNextRequestNumber();
     await addDoc(collection(db, "bookings"), {
       hotel: data.hotel,
       department: data.department,
@@ -95,10 +101,14 @@ bookingForm.addEventListener("submit", async (event) => {
       requester: data.requester,
       phone: data.phone,
       status: "pending",
+      requestNumber,
       createdAt: serverTimestamp(),
     });
-    bookingMessage.textContent = "ส่งคำขอเรียบร้อย!";
+    bookingMessage.textContent = `บันทึกสำเร็จ หมายเลขการจอง ${requestNumber}`;
     bookingForm.reset();
+    setTimeout(() => {
+      bookingMessage.textContent = "";
+    }, 2000);
   } catch (error) {
     bookingMessage.textContent = `บันทึกไม่สำเร็จ: ${error.message}`;
     bookingMessage.classList.add("error");
@@ -107,6 +117,8 @@ bookingForm.addEventListener("submit", async (event) => {
 
 function renderTickets(snapshot) {
   ticketList.innerHTML = "";
+  bookingsCache.clear();
+  exportSelect.innerHTML = '<option value="">เลือกหมายเลขการจองที่ Approve แล้ว</option>';
   if (snapshot.empty) {
     ticketList.innerHTML = "<p class='hint'>ยังไม่มีคำขอ</p>";
     return;
@@ -114,12 +126,23 @@ function renderTickets(snapshot) {
 
   snapshot.forEach((docSnap) => {
     const data = docSnap.data();
+    bookingsCache.set(docSnap.id, data);
+
+    if (data.status === "approved") {
+      const opt = document.createElement("option");
+      const label = data.requestNumber || docSnap.id;
+      opt.value = docSnap.id;
+      opt.textContent = `${label} • ${data.eventName || "ไม่ระบุชื่องาน"}`;
+      exportSelect.appendChild(opt);
+    }
+
     const card = document.createElement("article");
     card.className = "ticket-card";
     card.innerHTML = `
       <header>
         <div>
-          <p class="eyebrow">${data.hotel} • ${data.department}</p>
+          <p class="eyebrow">${data.requestNumber || docSnap.id}</p>
+          <p class="sub">${data.hotel} • ${data.department}</p>
           <h3>${data.eventName || "ไม่ระบุชื่องาน"}</h3>
           <p class="sub">${data.room} | ${data.layout}</p>
         </div>
@@ -199,6 +222,48 @@ refreshTickets.addEventListener("click", () => {
 });
 
 function exportTicketsToPdf() {
+  const selectedId = exportSelect.value;
+  if (!selectedId) {
+    alert("เลือกหมายเลขการจองที่ต้องการ Export");
+    return;
+  }
+
+  const booking = bookingsCache.get(selectedId);
+  if (!booking) {
+    alert("ไม่พบข้อมูลคำขอ");
+    return;
+  }
+
+  if (booking.status !== "approved") {
+    alert("Export ได้เฉพาะคำขอที่ Approved แล้วเท่านั้น");
+    return;
+  }
+
+  printArea.innerHTML = `
+    <div class="print-card">
+      <div class="print-header">
+        <div>
+          <p class="eyebrow">หมายเลขการจอง</p>
+          <h2>${booking.requestNumber || selectedId}</h2>
+        </div>
+        <div class="print-status">Approved</div>
+      </div>
+      <dl>
+        <div><dt>โรงแรม</dt><dd>${booking.hotel}</dd></div>
+        <div><dt>แผนก</dt><dd>${booking.department}</dd></div>
+        <div><dt>ห้องประชุม</dt><dd>${booking.room}</dd></div>
+        <div><dt>รูปแบบการจัดโต๊ะ</dt><dd>${booking.layout}</dd></div>
+        <div><dt>ชื่องาน</dt><dd>${booking.eventName || "-"}</dd></div>
+        <div><dt>วันที่</dt><dd>${booking.meetingDate}</dd></div>
+        <div><dt>เวลา</dt><dd>${booking.startTime} - ${booking.endTime}</dd></div>
+        <div><dt>ผู้จอง</dt><dd>${booking.requester}</dd></div>
+        <div><dt>โทร</dt><dd>${booking.phone}</dd></div>
+        <div class="full"><dt>Remark</dt><dd>${booking.remark || "-"}</dd></div>
+      </dl>
+      <p class="print-note">ใบคำขอที่ผ่านการอนุมัติสำหรับติดหน้าห้องประชุม</p>
+    </div>
+  `;
+
   window.print();
 }
 
@@ -252,6 +317,22 @@ function buildChart(snapshot) {
 function startDashboardListener() {
   const q = query(collection(db, "bookings"));
   onSnapshot(q, buildChart);
+}
+
+async function getNextRequestNumber() {
+  const latest = query(
+    collection(db, "bookings"),
+    orderBy("requestNumber", "desc"),
+    limit(1)
+  );
+  const snapshot = await getDocs(latest);
+  let next = 1;
+  if (!snapshot.empty) {
+    const current = snapshot.docs[0].data().requestNumber;
+    const currentNum = parseInt(String(current || "").replace("REQ", ""), 10);
+    if (!Number.isNaN(currentNum)) next = currentNum + 1;
+  }
+  return `REQ${String(next).padStart(4, "0")}`;
 }
 
 attachTicketEvents();

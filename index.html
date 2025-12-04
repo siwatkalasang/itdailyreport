@@ -114,12 +114,17 @@
       <div id="ticket-content" class="hidden">
         <div class="ticket-actions">
           <button id="refresh-tickets" class="secondary">รีเฟรชรายการ</button>
-          <button id="export-pdf" class="primary ghost">Export PDF</button>
+          <div class="export-controls">
+            <select id="export-select"></select>
+            <button id="export-pdf" class="primary ghost">Export PDF</button>
+          </div>
         </div>
         <div id="ticket-list" class="ticket-list"></div>
       </div>
     </section>
   </main>
+
+  <div id="print-area" aria-hidden="true"></div>
 
   <script type="module" src="firebase-config.js"></script>
   <script type="module" src="app.js"></script>

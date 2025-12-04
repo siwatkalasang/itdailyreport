@@ -251,7 +251,55 @@ button.danger {
   background: #f8fafc;
 }
 
-.ticket-actions { margin-bottom: 10px; display: flex; justify-content: flex-end; }
+.ticket-actions { margin-bottom: 10px; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: center; }
+.export-controls { display: flex; gap: 8px; align-items: center; }
+.export-controls select {
+  min-width: 240px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+}
+
+#print-area { display: none; }
+
+.print-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.print-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.print-header h2 { margin: 4px 0 0 0; }
+
+.print-status {
+  padding: 6px 12px;
+  background: rgba(22, 163, 74, 0.15);
+  color: #065f46;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.print-card dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px 18px;
+  margin: 0;
+}
+
+.print-card dt { color: var(--subtext); font-weight: 600; }
+.print-card dd { margin: 0; color: var(--text); }
+.print-card .full { grid-column: 1 / -1; }
+.print-note { margin-top: 12px; color: var(--subtext); font-style: italic; }
 
 @media (max-width: 720px) {
   .ticket-card header { flex-direction: column; align-items: flex-start; }
@@ -260,14 +308,8 @@ button.danger {
 
 @media print {
   body { background: #ffffff; }
-  .topbar,
-  .sidebar,
-  #pin-gate,
-  #refresh-tickets,
-  #export-pdf,
-  #menu-toggle { display: none !important; }
   body * { visibility: hidden; }
-  #ticket-section, #ticket-section * { visibility: visible; }
-  #ticket-section { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; }
+  #print-area, #print-area * { visibility: visible; }
+  #print-area { display: block !important; position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 16px; }
   .panel { box-shadow: none; border: none; }
 }
