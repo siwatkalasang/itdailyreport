@@ -29,6 +29,7 @@ const pinMessage = document.getElementById("pin-message");
 const ticketContent = document.getElementById("ticket-content");
 const ticketList = document.getElementById("ticket-list");
 const refreshTickets = document.getElementById("refresh-tickets");
+const exportPdfBtn = document.getElementById("export-pdf");
 let bookingChart;
 let unsubscribeTickets;
 
@@ -38,16 +39,31 @@ function toggleSidebar() {
 
 menuToggle.addEventListener("click", toggleSidebar);
 
+function showSection(targetId) {
+  sections.forEach((section) => {
+    section.classList.toggle("hidden", section.id !== targetId);
+  });
+  sidebar.classList.add("hidden");
+
+  if (targetId === "booking-section") {
+    bookingForm.reset();
+    bookingMessage.textContent = "";
+  }
+
+  if (targetId === "ticket-section") {
+    pinMessage.textContent = "";
+    pinMessage.classList.remove("error");
+    if (ticketContent.classList.contains("hidden")) {
+      pinInput.value = "";
+      pinInput.focus();
+    }
+  }
+}
+
 navLinks.forEach((link) => {
   link.addEventListener("click", (e) => {
     const targetId = e.target.dataset.target;
-    sections.forEach((section) => {
-      section.classList.toggle("hidden", section.id !== targetId);
-    });
-    sidebar.classList.add("hidden");
-    if (targetId === "ticket-section" && ticketContent.classList.contains("hidden")) {
-      pinInput.focus();
-    }
+    showSection(targetId);
   });
 });
 
@@ -182,6 +198,12 @@ refreshTickets.addEventListener("click", () => {
   }
 });
 
+function exportTicketsToPdf() {
+  window.print();
+}
+
+exportPdfBtn.addEventListener("click", exportTicketsToPdf);
+
 function buildChart(snapshot) {
   const counts = {};
   snapshot.forEach((docSnap) => {
@@ -202,7 +224,7 @@ function buildChart(snapshot) {
         {
           label: "จำนวนการจอง",
           data: values,
-          backgroundColor: "#4f46e5",
+          backgroundColor: "#2563eb",
           borderRadius: 8,
         },
       ],
